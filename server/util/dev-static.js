@@ -1,7 +1,9 @@
 const axios = require('axios')
+const path = require('path')
 // 通过webpack去拿到打包的文件
 const webpack = require('webpack')
 const MemoryFs = require('memory-fs')
+const proxy = require('http-proxy-middleware')
 const ReactDomServer = require('react-dom/server')
 
 const serverConfig = require('../../build/webpack.config.server')
@@ -33,14 +35,17 @@ serverCompiler.watch({}, (err, stats) => {
         serverConfig.output.filename
     )
 
-    const bundle = mfs.readFileSync(bundlePath)
+    const bundle = mfs.readFileSync(bundlePath, 'utf-8')
     const m = new Module()
-    m._compile(bundle)
-    serverBundle = m.default
+    m._compile(bundle, 'server-entry.js')
+    serverBundle = m.exports.default
 })
 
 module.exports = function (app) {
 
+    app.use('/public', proxy({
+        target: 'http://localhost:8888'
+    }))
     app.get('*', function(req, res) {
         getTemplate().then(template => {
             const content = ReactDomServer.renderToString(serverBundle)
