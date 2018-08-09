@@ -1,4 +1,4 @@
-###使用说明
+### 使用说明
 1. 构建文件
 ```
 npm run build
@@ -6,5 +6,10 @@ npm run build
 
 2. 运行服务
 ```
-npm start
+npm run dev:client
+```
+
+3. 清理构建文件
+```
+npm run clear
 ```
