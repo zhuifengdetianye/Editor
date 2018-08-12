@@ -17,6 +17,10 @@ const config = webpackMerge(baseConfig, {
   plugins: [
     new HTMLPlugin({
       template: path.join(__dirname, '../client/template.html')
+    }),
+    new HTMLPlugin({
+      template: '!!ejs-compiled-loader!' + path.join(__dirname, '../client/server.template.ejs'),
+      filename: 'server.ejs'
     })
   ],
   devtool: 'source-map'
@@ -37,11 +41,14 @@ if (isDev){
         contentBase:path.join(__dirname, '../dist'),
         hot: true,
         overlay: {
-            errors: true
+          errors: true
         },
         publicPath: '/public/',
         historyApiFallback: {
-            index: '/public/index.html'
+          index: '/public/index.html'
+        },
+        proxy: {
+          '/api': 'http://localhost:3333'
         }
     }
     config.plugins.push(new webpack.HotModuleReplacementPlugin())

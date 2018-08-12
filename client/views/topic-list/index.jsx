@@ -4,7 +4,9 @@ import {
   inject,
 } from 'mobx-react'
 import PropTypes from 'prop-types'
-import { AppState } from '../../store/app-state'
+import { createStoreMap } from '../../store/store'
+
+const AppState = createStoreMap()
 
 @inject('appState') @observer
 export default class TopicList extends React.Component {
@@ -15,6 +17,15 @@ export default class TopicList extends React.Component {
 
   componentDidMount() {
     // do something here
+  }
+
+  asyncBootstrap() {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        this.props.appState.count = 3
+        resolve(true)
+      })
+    })
   }
 
   changeName(event) {
