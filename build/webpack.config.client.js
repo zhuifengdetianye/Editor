@@ -9,7 +9,7 @@ const isDev = process.env.NODE_ENV === 'development'
 
 const config = webpackMerge(baseConfig, {
   entry: {
-    app: path.join(__dirname, '../client/app.js')
+    app: path.join(__dirname, '../.js')
   },
   output: {
     filename: 'app_[hash].js',
@@ -31,7 +31,7 @@ if (isDev){
     config.entry = {
         app: [
             'react-hot-loader/patch',
-            path.join(__dirname, '../client/app.js')
+            path.join(__dirname, '../pp.js')
         ]
     }
     //查看devServer文档

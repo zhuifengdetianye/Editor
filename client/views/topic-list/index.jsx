@@ -4,6 +4,8 @@ import {
   inject,
 } from 'mobx-react'
 import PropTypes from 'prop-types'
+import Helmet from 'react-helmet'
+
 import { createStoreMap } from '../../store/store'
 
 const AppState = createStoreMap()
@@ -35,6 +37,10 @@ export default class TopicList extends React.Component {
   render() {
     return (
       <div>
+        <Helmet>
+          <title>This is topic list</title>
+          <meta name="description" content="This is a description" />
+        </Helmet>
         <input type="text" onChange={this.changeName} />
         <div>{this.props.appState.msg}</div>
       </div>
