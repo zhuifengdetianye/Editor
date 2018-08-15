@@ -2,7 +2,7 @@ const express = require('express')
 const favicon = require('serve-favicon')
 const bodyParser = require('body-parser')
 const session = require('express-session')
-const ReactDOMServer = require('react-dom/server')
+const serverRender = require('./util/server-render')
 const fs = require('fs')
 const path = require('path')
 
@@ -27,21 +27,25 @@ app.use('/api', require('./util/proxy'))
 
 if (!isDev) {
     //引入服务端生成的代码
-    const serverEntry = require('../dist/server-entry').default
+    const serverEntry = require('../dist/server-entry')
 
-    const template = fs.readFileSync(path.join(__dirname, '../dist/index.html'), 'utf8')
+    const template = fs.readFileSync(path.join(__dirname, '../dist/server.ejs'), 'utf8')
 
     //express.static()负责托管express应用中的静态资源，它的第一个参数是静态资源文件所在的根目录
     app.use('/public', express.static(path.join(__dirname, '../dist')))
 
-    app.get('*', function (req, res) {
-        const appString = ReactDOMServer.renderToString(serverEntry)
-        res.send(template.replace('<!-- app -->', appString))
+    app.get('*', function (req, res, next) {
+        serverRender(serverEntry, template, req, res).catch(next)
     })
 } else {
     const devStatic = require('./util/dev-static')
     devStatic(app)
 }
+
+app.use(function (error, req, res, next) {
+  console.log(err)
+  res.status(500).send(error)
+})
 
 app.listen(3333, function () {
     console.log('listening on 3333')
