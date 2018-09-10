@@ -4,6 +4,12 @@ const ejs = require('ejs')
 const Helmet = require('react-helmet').default
 const ReactDomServer = require('react-dom/server')
 
+//material-ui做服务端渲染
+const SheetsRegistry = require('react-jss').SheetsRegistry
+const createMuiTheme = require('@material-ui/core/styles').createMuiTheme
+const createGenerateClassName = require('@material-ui/core/styles').createGenerateClassName
+const colors = require('@material-ui/core/colors')
+
 const getStoreState = (stores) => {
   // Object.keys()返回对象属性key所组成的数组，同时，注意reduce的用法
   return Object.keys(stores).reduce((result, storeName) => {
@@ -19,7 +25,24 @@ module.exports = (bundle, template, req, res) => {
     const createApp = bundle.default
     const routerContext = {}
     const stores = createStoreMap()
-    const app = createApp(stores, routerContext, req.url)
+
+    const sheetsRegistry = new SheetsRegistry()
+    const generateClassName = createGenerateClassName()
+    const theme = createMuiTheme({
+      palette: {
+        primary: colors.pink,
+        secondary: colors.lightBlue,
+        type: 'light',
+      },
+    })
+    const app = createApp(
+      stores,
+      routerContext,
+      sheetsRegistry,
+      generateClassName,
+      theme,
+      req.url
+    )
 
     asyncBootstrap(app).then(() => {
       if (routerContext.url) {
@@ -38,6 +61,7 @@ module.exports = (bundle, template, req, res) => {
         title: helmet.title.toString(),
         style: helmet.style.toString(),
         link: helmet.link.toString(),
+        materialCss: sheetsRegistry.toString()
       })
       res.send(html)
       // res.send(template.replace('<!-- app -->', content))
